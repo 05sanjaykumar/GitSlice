@@ -8,6 +8,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
+	"github.com/05sanjaykumar/Gitslice-CLI/internal/githubparser"
+
 )
 
 // sliceCmd represents the slice command
@@ -26,7 +29,7 @@ to quickly create a Cobra application.`,
         return
     }
 
-		gh, err := parseGitHubURL(args[0])
+		gh, err := githubparser.Parse(args[0])
 		if err != nil {
 			fmt.Printf("❌ Error parsing URL: %v\n", err)
 			return
