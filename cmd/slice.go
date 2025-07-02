@@ -19,14 +19,12 @@ import (
 
 // sliceCmd represents the slice command
 var sliceCmd = &cobra.Command{
-	Use:   "slice",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "gitslice <GitHub URL>",
+	Short: "Clone a single file or folder from a GitHub repo using sparse checkout.",
+	Long: `Example:
+	gitslice https://github.com/user/repo/blob/main/folder/file.js
+	`,
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
         fmt.Println("❌ Please provide a GitHub file or folder URL.")
