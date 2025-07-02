@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/05sanjaykumar/gitslice/cmd"
+import "github.com/05sanjaykumar/Gitslice-CLI/cmd"
 
 func main() {
 	cmd.Execute()

@@ -11,6 +11,10 @@ import (
 
 	"github.com/05sanjaykumar/Gitslice-CLI/internal/githubparser"
 
+	"github.com/05sanjaykumar/Gitslice-CLI/internal/clone"
+
+	
+
 )
 
 // sliceCmd represents the slice command

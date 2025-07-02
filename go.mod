@@ -1,4 +1,4 @@
-module github.com/05sanjaykumar/gitslice
+module github.com/05sanjaykumar/Gitslice-CLI
 
 go 1.24.2
 
