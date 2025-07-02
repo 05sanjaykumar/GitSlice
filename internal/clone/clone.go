@@ -78,35 +78,35 @@ func resolveBranchAndPath(clonePath string, postTree []string) (string, string, 
 	// Step 1: Read top-level folders inside the cloned repo
 	files, err := os.ReadDir(clonePath)
 
-	fmt.Println("📁 Top-level folders in cloned repo:")
-	for _, f := range files {
-		if f.IsDir() {
-			fmt.Println("  -", f.Name())
-		}
-	}
 
 	if err != nil {
 		return "", "", fmt.Errorf("❌ Failed reading cloned folder: %v", err)
 	}
 
 	// Step 2: Store folder names in a set (for O(1) lookup)
-	folderSet := make(map[string]bool)
+	folderSet := make([]string, 0)
 	for _, file := range files {
 		if file.IsDir() {
-			folderSet[file.Name()] = true
+			folderSet = append(folderSet, file.Name())
 		}
 	}
 
-	// Step 3: Find the index in postTree where a match begins
-	for i := 0; i < len(postTree); i++ {
-		if folderSet[postTree[i]] {
-			// Found the beginning of a valid path
-			branchCandidate := strings.Join(postTree[:i], "/")
-			pathCandidate := strings.Join(postTree[i:], "/")
+	fmt.Println("📁 Top-level folders in cloned repo:")
+	for _, f := range folderSet {
+		fmt.Println("  -", f)
+	}
 
-			// Confirm that the full path actually exists
-			fullPath := filepath.Join(clonePath, filepath.Join(postTree[i:]...))
-			if info, err := os.Stat(fullPath); err == nil && info.IsDir() {
+
+	// Step 3: Find matching folder from postTree against folderSet
+	for i := 0; i < len(postTree); i++ {
+		for _, topFolder := range folderSet {
+			if postTree[i] == topFolder {
+				branchCandidate := strings.Join(postTree[:i], "/")
+				pathCandidate := strings.Join(postTree[i:], "/")
+
+				fmt.Printf("🔍 Found matching folder: %s\n", pathCandidate)
+
+				// OPTIONAL: You can skip this stat check entirely
 				return branchCandidate, pathCandidate, nil
 			}
 		}
