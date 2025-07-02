@@ -9,12 +9,16 @@ import (
 )
 
 func RunSparseClone(owner, repo string, postTree []string) error {
+	fmt.Printf("owner: %s, repo: %s, postTree: %s\n", owner, repo, strings.Join(postTree, "/"))
+	// owner: supabase, repo: storage, postTree: fix/pgboss-on-error-callback/src/auth
 	repoURL := fmt.Sprintf("https://github.com/%s/%s.git", owner, repo)
+	// https://github.com/supabase/storage.git
 	cloneTemp := fmt.Sprintf("%s-branch-resolve-temp", repo)
+	// storage-branch-resolve-temp
 
 	// Step 0: Shallow clone without checkout to detect valid branch and path
 	fmt.Println("🚀 Cloning repository for branch resolution...")
-	cmd := exec.Command("git", "clone", "--filter=blob:none", "--no-checkout", repoURL, cloneTemp)
+	cmd := exec.Command("git", "clone", "--depth", "1", repoURL, cloneTemp)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
@@ -68,26 +72,49 @@ func RunSparseClone(owner, repo string, postTree []string) error {
 }
 
 
+// cloneTemp: storage-branch-resolve-temp
+// postTree: [fix, pgboss-on-error-callback, src, auth
 func resolveBranchAndPath(clonePath string, postTree []string) (string, string, error) {
-	for i := 1; i < len(postTree); i++ {
-		branchCandidate := postTree[:i]
-		pathCandidate := postTree[i:]
+	// Step 1: Read top-level folders inside the cloned repo
+	files, err := os.ReadDir(clonePath)
 
-		if len(pathCandidate) == 0 {
-			continue
+	fmt.Println("📁 Top-level folders in cloned repo:")
+	for _, f := range files {
+		if f.IsDir() {
+			fmt.Println("  -", f.Name())
 		}
+	}
 
-		// Join path inside clone directory
-		fullPath := filepath.Join(clonePath, filepath.Join(pathCandidate...))
+	if err != nil {
+		return "", "", fmt.Errorf("❌ Failed reading cloned folder: %v", err)
+	}
 
-		if info, err := os.Stat(fullPath); err == nil && info.IsDir() {
-			// We found a valid path inside repo, return match
-			return strings.Join(branchCandidate, "/"), strings.Join(pathCandidate, "/"), nil
+	// Step 2: Store folder names in a set (for O(1) lookup)
+	folderSet := make(map[string]bool)
+	for _, file := range files {
+		if file.IsDir() {
+			folderSet[file.Name()] = true
+		}
+	}
+
+	// Step 3: Find the index in postTree where a match begins
+	for i := 0; i < len(postTree); i++ {
+		if folderSet[postTree[i]] {
+			// Found the beginning of a valid path
+			branchCandidate := strings.Join(postTree[:i], "/")
+			pathCandidate := strings.Join(postTree[i:], "/")
+
+			// Confirm that the full path actually exists
+			fullPath := filepath.Join(clonePath, filepath.Join(postTree[i:]...))
+			if info, err := os.Stat(fullPath); err == nil && info.IsDir() {
+				return branchCandidate, pathCandidate, nil
+			}
 		}
 	}
 
 	return "", "", fmt.Errorf("❌ Could not resolve branch/path. Check if URL or folders exist")
 }
+
 
 func runCommand(args ...string) error {
 	fmt.Printf("▶️ Running: %s\n", args)
