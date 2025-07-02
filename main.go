@@ -21,8 +21,19 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/05sanjaykumar/Gitslice-CLI/cmd"
+import (
+	"fmt"
+
+	"github.com/05sanjaykumar/Gitslice-CLI/cmd"
+)
+
+var (
+    version   = "dev"
+    buildDate = "unknown"
+)
+
 
 func main() {
+	fmt.Printf("gitslice version: %s (built at %s)\n", version, buildDate)
 	cmd.Execute()
 }

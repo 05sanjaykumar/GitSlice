@@ -1,0 +1,30 @@
+# .goreleaser.yml
+version: 2
+
+project_name: gitslice
+
+builds:
+  - id: gitslice
+    main: ./main.go
+    goos: [linux, windows, darwin]
+    goarch: [amd64, arm64]
+    ldflags:
+      - "-s -w -X main.version={{.Version}} -X main.buildDate={{.Date}}"
+
+archives:
+  - id: default
+    builds: [gitslice]
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: 05sanjaykumar
+    name: gitslice-cli
+
