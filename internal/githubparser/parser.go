@@ -21,8 +21,14 @@ func Parse(rawURL string) (*GitHubURL, error) {
 	}
 
 	parts := strings.Split(u.Path, "/")
-	if len(parts) < 5 || parts[3] != "blob" {
-		return nil, fmt.Errorf("URL does not match expected GitHub blob pattern")
+	
+	if len(parts) < 5 {
+		return nil, fmt.Errorf("URL path is too short to parse")
+	}
+
+	contentType := parts[3]
+	if contentType != "blob" && contentType != "tree" {
+		return nil, fmt.Errorf("URL must contain either 'blob' (file) or 'tree' (folder), got: '%s'", contentType)
 	}
 
 	owner := parts[1]
