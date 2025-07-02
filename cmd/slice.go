@@ -37,7 +37,7 @@ var sliceCmd = &cobra.Command{
 			return
 		}
 
-		err = slice.RunSparseClone(gh.Owner, gh.Repo, gh.Branch, gh.Path)
+		err = slice.RunSparseClone(gh.Owner, gh.Repo, gh.PostTree)
 		if err != nil {
 			fmt.Printf("❌ Clone failed: %v\n", err)
 			return
