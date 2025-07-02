@@ -21,7 +21,24 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("slice called")
+		if len(args) < 1 {
+        fmt.Println("❌ Please provide a GitHub file or folder URL.")
+        return
+    }
+
+		gh, err := parseGitHubURL(args[0])
+		if err != nil {
+			fmt.Printf("❌ Error parsing URL: %v\n", err)
+			return
+		}
+
+		err = slice.RunSparseClone(gh.Owner, gh.Repo, gh.Branch, gh.Path)
+		if err != nil {
+			fmt.Printf("❌ Clone failed: %v\n", err)
+			return
+		}
+
+		fmt.Println("✅ Done.")
 	},
 }
 
