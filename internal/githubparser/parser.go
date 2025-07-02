@@ -18,18 +18,28 @@ func Parse(rawURL string) (*GitHubURL, error) {
 		return nil, fmt.Errorf("invalid URL: %w", err)
 	}
 
-	parts := strings.Split(u.Path, "/")
-	if len(parts) < 6 {
+	parts := strings.Split(strings.Trim(u.Path, "/"), "/") // Trim leading/trailing slashes
+	if len(parts) < 2 {
 		return nil, fmt.Errorf("URL path too short to parse")
 	}
 
-	if parts[3] != "tree" && parts[3] != "blob" {
-		return nil, fmt.Errorf("URL must contain 'tree' or 'blob'")
+	// Full repo clone URL: https://github.com/owner/repo
+	if len(parts) == 2 {
+		return &GitHubURL{
+			Owner:    parts[0],
+			Repo:     strings.TrimSuffix(parts[1], ".git"),
+			PostTree: []string{}, // no subdir
+		}, nil
 	}
 
-	return &GitHubURL{
-		Owner:    parts[1],
-		Repo:     parts[2],
-		PostTree: parts[4:],
-	}, nil
+	// Sparse clone URL: https://github.com/owner/repo/tree/branch/path/to/folder
+	if len(parts) >= 4 && (parts[2] == "tree" || parts[2] == "blob") {
+		return &GitHubURL{
+			Owner:    parts[0],
+			Repo:     parts[1],
+			PostTree: parts[3:], // includes branch + path
+		}, nil
+	}
+
+	return nil, fmt.Errorf("URL must be a GitHub repo or contain 'tree' or 'blob' for paths")
 }

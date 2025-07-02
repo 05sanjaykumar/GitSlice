@@ -12,9 +12,22 @@ func RunSparseClone(owner, repo string, postTree []string) error {
 	fmt.Printf("owner: %s, repo: %s, postTree: %s\n", owner, repo, strings.Join(postTree, "/"))
 	// owner: supabase, repo: storage, postTree: fix/pgboss-on-error-callback/src/auth
 	repoURL := fmt.Sprintf("https://github.com/%s/%s.git", owner, repo)
-	// https://github.com/supabase/storage.git
+
+	if len(postTree) == 0 {
+		fmt.Println("📦 No subpath specified, doing full clone...")
+		repoName := fmt.Sprintf("%s-full-clone", repo)
+		cmd := exec.Command("git", "clone", repoURL, repoName)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("❌ Full clone failed: %w", err)
+		}
+		fmt.Printf("✅ Done! Repo cloned to: %s\n", repoName)
+		return nil
+	}
+
 	cloneTemp := fmt.Sprintf("%s-branch-resolve-temp", repo)
-	// storage-branch-resolve-temp
+
 
 	// Step 0: Shallow clone without checkout to detect valid branch and path
 	fmt.Println("🚀 Cloning repository for branch resolution...")
