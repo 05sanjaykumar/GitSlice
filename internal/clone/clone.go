@@ -5,15 +5,38 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
-func RunSparseClone(owner, repo, branch, path string) error {
+func RunSparseClone(owner, repo string, postTree []string) error {
+	fmt.Printf("owner: %s, repo: %s, postTree: %s\n", owner, repo, strings.Join(postTree, "/"))
+	// owner: supabase, repo: storage, postTree: fix/pgboss-on-error-callback/src/auth
 	repoURL := fmt.Sprintf("https://github.com/%s/%s.git", owner, repo)
-	repoName := fmt.Sprintf("%s-%s-temp", repo, filepath.Base(path)) // unique temp folder
+	// https://github.com/supabase/storage.git
+	cloneTemp := fmt.Sprintf("%s-branch-resolve-temp", repo)
+	// storage-branch-resolve-temp
+
+	// Step 0: Shallow clone without checkout to detect valid branch and path
+	fmt.Println("🚀 Cloning repository for branch resolution...")
+	cmd := exec.Command("git", "clone", "--depth", "1", repoURL, cloneTemp)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("❌ Failed to clone for resolving branch: %w", err)
+	}
+
+	branch, path, err := resolveBranchAndPath(cloneTemp, postTree)
+	if err != nil {
+		os.RemoveAll(cloneTemp)
+		return err
+	}
+	os.RemoveAll(cloneTemp) // Clean temp clone
+
+	// Unique temp folder for sparse checkout
+	repoName := fmt.Sprintf("%s-%s-temp", repo, filepath.Base(path))
 	targetName := filepath.Base(path)
 
-	// Step 1: Clone with sparse checkout
-	fmt.Println("🚀 Cloning repository...")
+	// Step 1: Sparse checkout
 	commands := [][]string{
 		{"git", "clone", "--filter=blob:none", "--no-checkout", repoURL, repoName},
 		{"git", "-C", repoName, "sparse-checkout", "init", "--no-cone"},
@@ -27,7 +50,7 @@ func RunSparseClone(owner, repo, branch, path string) error {
 		}
 	}
 
-	// Step 2: Move file/folder out
+	// Step 2: Move file/folder
 	src := filepath.Join(repoName, path)
 	dst := targetName
 
@@ -36,8 +59,7 @@ func RunSparseClone(owner, repo, branch, path string) error {
 	}
 
 	fmt.Printf("📦 Extracting %s...\n", src)
-	err := os.Rename(src, dst)
-	if err != nil {
+	if err := os.Rename(src, dst); err != nil {
 		return fmt.Errorf("❌ Failed to move: %v", err)
 	}
 
@@ -48,6 +70,51 @@ func RunSparseClone(owner, repo, branch, path string) error {
 	fmt.Printf("✅ Done! Extracted to: %s\n", dst)
 	return nil
 }
+
+
+// cloneTemp: storage-branch-resolve-temp
+// postTree: [fix, pgboss-on-error-callback, src, auth
+func resolveBranchAndPath(clonePath string, postTree []string) (string, string, error) {
+	// Step 1: Read top-level folders inside the cloned repo
+	files, err := os.ReadDir(clonePath)
+
+
+	if err != nil {
+		return "", "", fmt.Errorf("❌ Failed reading cloned folder: %v", err)
+	}
+
+	// Step 2: Store folder names in a set (for O(1) lookup)
+	folderSet := make([]string, 0)
+	for _, file := range files {
+		if file.IsDir() {
+			folderSet = append(folderSet, file.Name())
+		}
+	}
+
+	fmt.Println("📁 Top-level folders in cloned repo:")
+	for _, f := range folderSet {
+		fmt.Println("  -", f)
+	}
+
+
+	// Step 3: Find matching folder from postTree against folderSet
+	for i := 0; i < len(postTree); i++ {
+		for _, topFolder := range folderSet {
+			if postTree[i] == topFolder {
+				branchCandidate := strings.Join(postTree[:i], "/")
+				pathCandidate := strings.Join(postTree[i:], "/")
+
+				fmt.Printf("🔍 Found matching folder: %s\n", pathCandidate)
+
+				// OPTIONAL: You can skip this stat check entirely
+				return branchCandidate, pathCandidate, nil
+			}
+		}
+	}
+
+	return "", "", fmt.Errorf("❌ Could not resolve branch/path. Check if URL or folders exist")
+}
+
 
 func runCommand(args ...string) error {
 	fmt.Printf("▶️ Running: %s\n", args)

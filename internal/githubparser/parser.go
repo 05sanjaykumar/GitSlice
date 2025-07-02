@@ -7,12 +7,10 @@ import (
 )
 
 type GitHubURL struct {
-	Owner  string
-	Repo   string
-	Branch string
-	Path   string
+	Owner    string
+	Repo     string
+	PostTree []string
 }
-
 
 func Parse(rawURL string) (*GitHubURL, error) {
 	u, err := url.Parse(rawURL)
@@ -21,25 +19,17 @@ func Parse(rawURL string) (*GitHubURL, error) {
 	}
 
 	parts := strings.Split(u.Path, "/")
-	
-	if len(parts) < 5 {
-		return nil, fmt.Errorf("URL path is too short to parse")
+	if len(parts) < 6 {
+		return nil, fmt.Errorf("URL path too short to parse")
 	}
 
-	contentType := parts[3]
-	if contentType != "blob" && contentType != "tree" {
-		return nil, fmt.Errorf("URL must contain either 'blob' (file) or 'tree' (folder), got: '%s'", contentType)
+	if parts[3] != "tree" && parts[3] != "blob" {
+		return nil, fmt.Errorf("URL must contain 'tree' or 'blob'")
 	}
-
-	owner := parts[1]
-	repo := parts[2]
-	branch := parts[4]
-	path := strings.Join(parts[5:], "/")
 
 	return &GitHubURL{
-		Owner:  owner,
-		Repo:   repo,
-		Branch: branch,
-		Path:   path,
+		Owner:    parts[1],
+		Repo:     parts[2],
+		PostTree: parts[4:],
 	}, nil
 }
