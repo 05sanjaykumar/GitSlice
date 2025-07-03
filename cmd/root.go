@@ -25,14 +25,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/05sanjaykumar/gitslice/internal/clone"
+
+	"github.com/05sanjaykumar/gitslice/internal/githubparser"
 	"github.com/spf13/cobra"
 )
 
-var version = "dev" // This will be overwritten by goreleaser via ldflags
+var version = "dev" // overridden by goreleaser
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     "gitslice",
+	Use:     "gitslice <GitHub URL>",
 	Short:   "⚡ Extract folders from GitHub repos — fast",
 	Long: `GitSlice is a blazing-fast CLI tool to clone or extract any folder or file from a GitHub repository using sparse-checkout.
 
@@ -48,18 +50,31 @@ Features:
   • Auto path resolution
   • Cross-platform compatible`,
 	Version: version,
-
-	// Optional: Show help if no args provided
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		if len(args) < 1 {
+			cmd.Help()
+			return
+		}
+
+		gh, err := githubparser.Parse(args[0])
+		if err != nil {
+			fmt.Printf("❌ Error parsing URL: %v\n", err)
+			return
+		}
+
+		err = slice.RunSparseClone(gh.Owner, gh.Repo, gh.PostTree)
+		if err != nil {
+			fmt.Printf("❌ Clone failed: %v\n", err)
+			return
+		}
+
+		fmt.Println("✅ Done.")
 	},
 }
 
-// Execute runs the root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println("❌ Error:", err)
 		os.Exit(1)
 	}
 }
-
