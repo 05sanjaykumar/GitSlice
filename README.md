@@ -1,13 +1,13 @@
 # 🧩 GitSlice CLI
 
-**A blazing-fast CLI tool to extract specific folders from GitHub repositories using sparse-checkout.**  
+**A CLI tool to extract specific folders or file from GitHub repositories using sparse-checkout.**  
 Designed for speed, simplicity, and developers who don't want to clone massive repos unnecessarily.
 
 ---
 
 ## 🚀 Features
 
-- ⚡️ Extract a specific folder from any GitHub repo
+- ⚡️ Extract a specific folder or file from any GitHub repo
 - 🔍 Automatically resolves deep nested paths like `/tree/branch/src/utils/`
 - 🌲 Uses Git sparse-checkout for minimal clone footprint
 - 🧹 Cleans up temp files after extraction
@@ -39,7 +39,7 @@ go build -o gitslice main.go
 ### Basic Syntax
 
 ```bash
-gitslice <github-folder-url>
+gitslice <github-folder-or-file-url>
 ```
 
 ### Examples
@@ -52,9 +52,13 @@ gitslice https://github.com/supabase/storage/tree/fix/pgboss-on-error-callback/s
 gitslice https://github.com/vercel/next.js/tree/canary/packages/next
 ```
 
+```bash
+gitslice https://github.com/05sanjaykumar/Flappy-Bird-OpenCV/blob/main/assets/background-day.png
+```
+
 ### Output
 
-* Extracts folder to the current directory.
+* Extracts folder/file to the current directory.
 * Auto-detects branch and path.
 
 ---
@@ -70,11 +74,11 @@ gitslice --version   # Show version
 
 ## 🧠 How It Works
 
-1. Parses the GitHub URL and extracts the owner, repo, branch, and folder path.
+1. Parses the GitHub URL and extracts the owner, repo, branch, and folder or file path.
 2. Clones the repo in sparse mode without full checkout.
-3. Sets up sparse-checkout for the specific folder.
+3. Sets up sparse-checkout for the specific folder or file.
 4. Switches to the correct branch and checks out only the required path.
-5. Moves the folder to your working directory and cleans up.
+5. Moves the folder or file to your working directory and cleans up.
 
 ---
 
@@ -82,11 +86,11 @@ gitslice --version   # Show version
 
 Despite its power, `GitSlice` does have a few **known limitations**:
 
-* **Branch-specific folders only**: If a folder exists *only* in a non-default branch (e.g., not in `main`), `GitSlice` might not detect or clone it correctly unless the branch is explicitly specified in the URL.
+* **Branch-specific folders only**: If a folder or a file exists *only* in a non-default branch (e.g., not in `main`), `GitSlice` might not detect or clone it correctly unless the branch is explicitly specified in the URL.
 
 * **Private repositories**: GitSlice currently only works with **public GitHub repositories**. Support for private repos (with authentication) is not yet implemented.
 
-* **Path guessing limitations**: The CLI resolves folder paths by pattern matching on local clone results. In very complex or dynamically generated repos, edge cases may slip through.
+* **Path guessing limitations**: The CLI resolves folder or file paths by pattern matching on local clone results. In very complex or dynamically generated repos, edge cases may slip through.
 
 * **Shallow branch detection**: We don't fetch the full remote branch list — only the default or specified branch is used for sparse-checkout. If you mistype the branch name or forget it in the URL, cloning will fail.
 
@@ -118,7 +122,7 @@ If you hit an edge case or repo structure the tool doesn't support, open an issu
 
 ## 🌟 Why GitSlice?
 
-Because cloning an entire repo when you just want one folder is like ordering a pizza and getting the whole restaurant.
+Because cloning an entire repo when you just want one folder or file is like ordering a pizza and getting the whole restaurant.
 GitSlice gives you just the slice you need.
 
 
