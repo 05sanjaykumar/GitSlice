@@ -121,5 +121,4 @@ If you hit an edge case or repo structure the tool doesn't support, open an issu
 Because cloning an entire repo when you just want one folder is like ordering a pizza and getting the whole restaurant.
 GitSlice gives you just the slice you need.
 
-```
 
