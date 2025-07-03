@@ -27,6 +27,3 @@ release:
   github:
     owner: 05sanjaykumar
     name: gitslice-cli
-
-envfiles:
-  - .env
