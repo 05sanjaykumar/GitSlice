@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/05sanjaykumar/Gitslice-CLI/internal/githubparser"
+	"github.com/05sanjaykumar/gitslice/internal/githubparser"
 
-	"github.com/05sanjaykumar/Gitslice-CLI/internal/clone"
+	"github.com/05sanjaykumar/gitslice/internal/clone"
 
 	
 

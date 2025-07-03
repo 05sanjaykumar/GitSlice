@@ -21,14 +21,14 @@ Designed for speed, simplicity, and developers who don't want to clone massive r
 ### With Go
 
 ```bash
-go install github.com/05sanjaykumar/Gitslice-CLI@latest
+go install github.com/05sanjaykumar/gitslice@latest
 ````
 
 ### Or clone and build:
 
 ```bash
-git clone https://github.com/05sanjaykumar/Gitslice-CLI
-cd gitslice-cli
+git clone https://github.com/05sanjaykumar/gitslice
+cd gitslice
 go build -o gitslice main.go
 ```
 

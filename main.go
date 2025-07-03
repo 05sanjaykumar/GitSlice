@@ -24,7 +24,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/05sanjaykumar/Gitslice-CLI/cmd"
+	"github.com/05sanjaykumar/gitslice/cmd"
 )
 
 var (
