@@ -28,8 +28,8 @@ import (
 )
 
 var (
-    version   = "dev"
-    buildDate = "unknown"
+    version   = "v0.1.0"
+    buildDate = "2/7/2025"
 )
 
 

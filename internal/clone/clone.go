@@ -84,9 +84,6 @@ func RunSparseClone(owner, repo string, postTree []string) error {
 	return nil
 }
 
-
-// cloneTemp: storage-branch-resolve-temp
-// postTree: [fix, pgboss-on-error-callback, src, auth
 func resolveBranchAndPath(clonePath string, postTree []string) (string, string, error) {
 	// Step 1: Read top-level folders inside the cloned repo
 	files, err := os.ReadDir(clonePath)
@@ -119,7 +116,6 @@ func resolveBranchAndPath(clonePath string, postTree []string) (string, string, 
 
 				fmt.Printf("🔍 Found matching folder: %s\n", pathCandidate)
 
-				// OPTIONAL: You can skip this stat check entirely
 				return branchCandidate, pathCandidate, nil
 			}
 		}
