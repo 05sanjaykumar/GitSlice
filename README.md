@@ -82,6 +82,36 @@ gitslice --version   # Show version
 
 ---
 
+## 🆚 GitSlice vs Manual Git Commands
+
+### With GitSlice ✨
+```bash
+gitslice https://github.com/user/repo/tree/branch/folder
+```
+
+### Manual Git Way 😵
+```bash
+git clone --filter=blob:none --sparse https://github.com/user/repo
+cd repo
+git sparse-checkout init --cone
+git sparse-checkout set folder
+git checkout branch
+cp -r folder ../
+cd ..
+rm -rf repo
+```
+
+**GitSlice does in 1 command what takes 7 manual steps:**
+- ✅ Parses GitHub URLs automatically
+- ✅ Handles branch detection
+- ✅ Sets up sparse-checkout configuration
+- ✅ Manages temporary directories
+- ✅ Cleans up after extraction
+- ✅ Works with both folders and individual files
+- ✅ Remembers the complex git syntax so you don't have to
+
+*Yes, GitSlice requires git to be installed - just like how npm requires Node.js, docker-compose requires Docker, and gh requires git. It's a productivity wrapper that makes complex git operations simple and accessible.*
+
 ## ⚠️ Limitations & Edge Cases
 
 Despite its power, `GitSlice` does have a few **known limitations**:
