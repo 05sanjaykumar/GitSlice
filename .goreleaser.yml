@@ -26,4 +26,4 @@ checksum:
 release:
   github:
     owner: 05sanjaykumar
-    name: gitslice-cli
+    name: gitslice
