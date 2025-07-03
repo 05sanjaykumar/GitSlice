@@ -19,7 +19,8 @@ import (
 
 // sliceCmd represents the slice command
 var sliceCmd = &cobra.Command{
-	Use:   "gitslice <GitHub URL>",
+	Use:   "_default <GitHub URL>",
+	Hidden: true,
 	Short: "Clone a single file or folder from a GitHub repo using sparse checkout.",
 	Long: `Example:
 	gitslice https://github.com/user/repo/blob/main/folder/file.js
