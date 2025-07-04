@@ -149,10 +149,7 @@ Pull requests and issues are welcome!
 If you hit an edge case or repo structure the tool doesn't support, open an issue and let’s improve it together.
 
 ---
+## Logo Image
 
-## 🌟 Why GitSlice?
-
-Because cloning an entire repo when you just want one folder or file is like ordering a pizza and getting the whole restaurant.
-GitSlice gives you just the slice you need.
-
+![Gitslice CLI](https://github.com/user-attachments/assets/5668c238-83b8-4cc0-b96e-1394e96ebe39)
 
